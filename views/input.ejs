@@ -1,0 +1,95 @@
+<!doctype html>
+
+<%- include('layout') %>
+
+<div class="page">
+  <h1>Retail Churn Prediction</h1>
+  <div class="metanav">
+    <a class="" href="/">Churn</a>
+  </div>
+
+<center><image src="Watson.png" height="200" width="200" /></center>
+
+
+<div class="results">
+    <h2 id="prediction"></h2>
+    <h2 id="probability"></h2>
+    <br><br>
+    <canvas id="myChart" width="200px" height="200px"></canvas>
+</div>
+
+<br>
+<br>
+
+<h2>Will a customer churn or not?</h2>
+<p>Input the following information to make a prediction.</p>
+<br>
+
+<!-- <form `action="#" method="post" class="add-entry" onsubmit="return true;"> -->
+<form action="#" method="post" class="add-entry" onsubmit="return false;">
+
+<!--
+{
+	"fields": ["Retire", "Mortgage", "LOC", "GENDER", "CHILDREN", "WORKING", "HighMonVal", "AgeRange", "Frequency_score"],
+	"values": [
+		[1, "Yes", "No", "Female", "No", "Yes", "No", "23 to 30", 2]
+		,[1, "Yes", "No", "Male", "No", "Yes", "No", "23 to 30", 2]
+		,[1, "Yes", "No", "Female", "Yes", "Yes", "Yes", "23 to 30", 2]
+		,[1, "No", "Yes", "Female", "No", "Yes", "No", "23 to 30", 2]
+	]
+}
+-->
+
+    <dl>
+      <dt>Retired:</dt>
+      <dd><label><input type="radio" name="RETIRE" class="onchange" value=1 checked>Yes</label>
+          <label><input type="radio" name="RETIRE" class="onchange" value=0>No</label>
+      </dd><br>
+      <dt>Mortgage:</dt>
+      <dd><label><input type="radio" name="MORTGAGE" class="onchange" value="Yes" checked>Yes</label>
+          <label><input type="radio" name="MORTGAGE" class="onchange" value="No">No</label>
+      </dd><br>
+      <dt>Line of Credit:</dt>
+      <dd><label><input type="radio" name="LOC" class="onchange" value="Yes" checked>Yes</label>
+          <label><input type="radio" name="LOC" class="onchange" value="No">No</label>
+      </dd><br>
+      <dt>Gender:</dt>
+      <dd><label><input type="radio" name="GENDER" class="onchange" value="Male" checked>Male</label>
+          <label><input type="radio" name="GENDER" class="onchange" value="Female">Female</label>
+      </dd><br>
+      <dt>Children:</dt>
+      <dd><label><input type="radio" name="CHILDREN" class="onchange" value="Yes" checked>Yes</label>
+          <label><input type="radio" name="CHILDREN" class="onchange" value="No">No</label>
+      </dd><br>
+      <dt>Working:</dt>
+      <dd><label><input type="radio" name="WORKING" class="onchange" value="Yes" checked>Yes</label>
+          <label><input type="radio" name="WORKING" class="onchange" value="No">No</label>
+      </dd><br>
+      <dt>High Value:</dt>
+      <dd><label><input type="radio" name="HighMonVal" class="onchange" value="Yes" checked>Yes</label>
+          <label><input type="radio" name="HighMonVal" class="onchange" value="No">No</label>
+      </dd><br>
+      <dt>Age Range:</dt>
+      <dd><label><input type="radio" name="AgeRange" class="onchange" value="17 to 22" checked>17-22</label>
+          <label><input type="radio" name="AgeRange" class="onchange" value="23 to 30">23-30</label>
+          <label><input type="radio" name="AgeRange" class="onchange" value="31 to 40">31-40</label><br>
+          <label><input type="radio" name="AgeRange" class="onchange" value="40 to 60">41-60</label>
+          <label><input type="radio" name="AgeRange" class="onchange" value="60 to 70">61-70</label>
+      </dd><br>
+      <dt>Frequence Score:</dt>
+      <dd><label><input type="radio" name="Frequency_score" class="onchange" value=1 checked>1</label>
+          <label><input type="radio" name="Frequency_score" class="onchange" value=2>2</label>
+          <label><input type="radio" name="Frequency_score" class="onchange" value=3>3</label><br>
+          <label><input type="radio" name="Frequency_score" class="onchange" value=4>4</label>
+          <label><input type="radio" name="Frequency_score" class="onchange" value=5>5</label>
+          <label><input type="radio" name="Frequency_score" class="onchange" value=6>6</label>
+      </dd><br>
+
+        <!-- <dt><input type="submit" value="Submit"></dt> -->
+    </dl>
+</form>
+
+<br>
+<footer>
+Updated August 1, 2018
+</footer>

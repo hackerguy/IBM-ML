@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    run: ibm-ml-deployment
+  name: ibm-ml-deployment
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/ibm-ml-deployment
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: ibm-ml-deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: ibm-ml-deployment
+    spec:
+      containers:
+      - image: registry.ng.bluemix.net/ibm-ml/ibm-ml:1.0
+        imagePullPolicy: Always
+        name: ibm-ml-deployment
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+        - name: wml_username
+          valueFrom:
+            secretKeyRef:
+              name: wml-secret
+              key: wml_username
+        - name: wml_password
+          valueFrom:
+            secretKeyRef:
+              name: wml-secret
+              key: wml_password
+        - name: pg_user
+          valueFrom:
+            secretKeyRef:
+              name: pg-secret
+              key: pg_user
+        - name: pg_password
+          valueFrom:
+            secretKeyRef:
+              name: pg-secret
+              key: pg_password
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
