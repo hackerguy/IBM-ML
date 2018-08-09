@@ -180,7 +180,7 @@ tokenGet(wml_username, wml_password, service_path, token_path,
                 client.query('BEGIN', (err) => {
                   if (shouldAbort(err)) return
 
-                  const insertText = 'INSERT INTO churn.churn(Retire, Mortgage, LOC, GENDER, CHILDREN, WORKING, HighMonVal ,AgeRange, Frequency_score, prediction, probability) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
+                  const insertText = 'INSERT INTO public.churn(Retire, Mortgage, LOC, GENDER, CHILDREN, WORKING, HighMonVal ,AgeRange, Frequency_score, prediction, probability) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
                   const insertValues = [RETIRE, MORTGAGE, LOC, GENDER, CHILDREN, WORKING, HighMonVal ,AgeRange, Frequency_score, prediction, probability.toFixed(5)]
                   client.query(insertText, insertValues, (err, res) => {
                     if (shouldAbort(err)) return
