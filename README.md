@@ -17,9 +17,6 @@ A Node.js web application used to score the model is containerized, deployed in 
 
 ![Demo Flow](images/Flow.png)
 
-The Node.js web application that you will deploy in Kubernetes to score the model looks like this.
-
-![app](images/app.jpg)
 
 Upon scoring customers with the web application, the feature values scored along with the model prediction results, both the churn prediction as well as the probability of chrun are inserted into a PostgreSQL database table. The table columns correpond to the nine features used to train the model along with two additional columns for the prediction result and the probability.
 
@@ -32,11 +29,6 @@ Upon scoring customers with the web application, the feature values scored along
 	* <https://console.bluemix.net/>
 * Watson Studio account
 	* <https://dataplatform.cloud.ibm.com/>
-
-## Preliminaries
-
-1. Create a Watson Studio project
-3. Provision a Free IBM Cloud Kubernetes service
 
 
 ## Instructions
@@ -57,14 +49,14 @@ You should now have a model and deployment in your project.
 
 Download and install IBM Cloud CLI tools and the IBM Kubernetes Service plug-in.       
               
-***For Mac and Linux, run the following command:***
+For Mac and Linux, run the following command:
 
 	$ curl -sL https://ibm.biz/idt-installer | bash
 	
-***For Windows 10 Pro, run the following command as an administrator:***    
-Right-click the Windows PowerShell icon, and select Run as administrator.
+For Windows 10 Pro, run the following command as an administrator:   
+(Right-click the Windows PowerShell icon, and select Run as administrator.)
 
-	> Set-ExecutionPolicy Unrestricted; iex(New-Object Net.WebClient).DownloadString('http://ibm.biz/idt-win-installer')
+	C:\> Set-ExecutionPolicy Unrestricted; iex(New-Object Net.WebClient).DownloadString('http://ibm.biz/idt-win-installer')
 	
 Log in to your IBM Cloud account.
 	
@@ -77,7 +69,8 @@ Create a free cluster.
 Check status of cluster. The state of the cluser will initially be 'requested'. The state will then change to 'deploying', then 'pending' and eventually to 'normal'.	
 
 	$ ibmcloud ks clusters
-	
+
+***You can NOT proceed further with the lab until the cluster is created and the status show as 'normal'.***
 	
 Target the IBM Cloud Container Service region where the cluster was provisioned.
 
@@ -119,9 +112,41 @@ You will see the PostgreSQL interactive terminal (psql) prompt.
 `If you don't see a command prompt, try pressing enter.`  
 `churndb=#`
 
+Create the table for storing the churn predictions by cutting and pasting the following table create statement into psql.
 
+```
+-- Table: public.churn
 
+-- DROP TABLE public.churn;
+
+CREATE TABLE public.churn
+(
+    retire integer,
+    mortgage text COLLATE pg_catalog."default",
+    loc text COLLATE pg_catalog."default",
+    gender text COLLATE pg_catalog."default",
+    children text COLLATE pg_catalog."default",
+    working text COLLATE pg_catalog."default",
+    highmonval text COLLATE pg_catalog."default",
+    agerange text COLLATE pg_catalog."default",
+    frequency_score integer,
+    prediction integer,
+    probability double precision
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.churn
+    OWNER to postgres;
+    
+```
+Exit from psql by typing '\q' at the psql prompt.
+
+	churndb-# \q
 	
+***Only exit from psql. Do NOT close the terminal.***
 	
 ### Deploy the application
 
@@ -203,12 +228,61 @@ kube-hou02-pa551ca23425854181a04a73c495951366-w1   184.172.234.202   10.76.154.1
 ```
 Find the Public IP. The Public IP you would want from output above would be '184.172.234.202'.
 
+### Score the model
 
 In a web browser, go to https://Public IP:NodePort. For example, <http://184.172.234.202:32482>.
 
-***This URL will not work for you. Make sure to replace the Public IP and the Node Port with the values associated with your Kubernetes cluster and service deployment.***
+***This URL will not work for you. Make sure to replace the Public IP and the Node Port with the values associated with your Kubernetes cluster and service deployment that you found above.***
+
+The Node.js web application should look like this.
+
+![app](images/app.jpg)
+
+Change any of the radio button inputs, representing the features on which the machine learning model was trained, to rescore the model and display the prediction associated with the set of input features.
+
+The application is designed to rescore the machine learning model and update the prediction EVERY time an input feature is changed using the radio buttons. Each time an input feature is changed, the values of the input features and the churn prediction are written to the PostgreSQL database table as a new row.
+
+Let now take a look at the data you've written to the database.
+
+### Investigate the scoring results written to the PostgreSQL database
+
+Go back to PostgreSQL interactive terminal.
+
+	$ kubectl run --namespace default postgres-release-postgresql-client --restart=Never --rm --tty -i --image postgres --env "PGPASSWORD=$PGPASSWORD" --command -- psql -U user -h postgres-release-postgresql churndb
+
+You should be at the psql prompt that looks like this.
+
+	churndb=#
+
+Run the following SQL query to show all rows in the table.
+
+	select * from public.churn;
+	
+You should see results that look like this.
+
+```
+ retire | mortgage | loc | gender | children | working | highmonval | agerange | frequency_score | prediction | probability 
+--------+----------+-----+--------+----------+---------+------------+----------+-----------------+------------+-------------
+      1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 17 to 22 |               1 |          1 |     0.32192
+(1 row)
+
+```
+Change another radio input in the web app, rerun the SQL query, and notice how each time you change a radio button, a new row is added to the database table.
+
+```
+ retire | mortgage | loc | gender | children | working | highmonval | agerange | frequency_score | prediction | probability 
+--------+----------+-----+--------+----------+---------+------------+----------+-----------------+------------+-------------
+      1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 17 to 22 |               1 |          1 |     0.32192
+      1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 60 to 70 |               1 |          1 |     0.17499
+(2 rows)
+
+```
 
 
 
 
- # IBM-ML
+
+
+
+
+ 
