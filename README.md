@@ -1,14 +1,13 @@
 # MACHINE LEARNING ON IBM CLOUD
 
-## Overview
 
 This repository contains a set of assets to demonstrate the development and deployment of a cognitive application on IBM Cloud. In this demonstration, you will build a machine learning model to predict the likelihood that a retail customer will churn, deploy a cognitive application that employs this model to score customers on their likelihood to churn, and store the scoring results in a database for further analysis.
 
-The demo begins with ingesting two data sets - one with customer demographic information and the other with customer transaction history, joining, cleansing, and preparing the data for machine learning, training and evaluating a machine learning model to predict customer churn, and deploying the model as a REST API endpoint. An application is then deployed that hits this endpoint to score customers based on the highly predictive features on which the model was trained. Results of each scoring request are then stored in a database.
+The demo begins with ingesting two data sets - one with customer demographic information and the other with customer transaction history, joining, cleansing, and preparing the data for machine learning, training and evaluating a machine learning model to predict customer churn, and deploying the model as a REST API endpoint. An application is then deployed that hits this endpoint to score customers based on what was determined during model develpment to be the features with the highest predictive value. Results of each scoring request are then stored in a database for further analysis.
 
 ## <a name="toc"></a>Table of Contents
 
-* [Demo Flow](#demo-flow)
+* [Overview](#overview)
 * [Prerequisites](#prerequisites)
 * [Instructions](#instructions)
 	* [Build, save and deploy the machine learning model](#build)
@@ -19,16 +18,36 @@ The demo begins with ingesting two data sets - one with customer demographic inf
 	* [Investigate the scoring results written to the PostgreSQL database](#database)
 * [Final Comments](#final)
 
-## <a name="demo-flow"></a>Demo Flow
+## <a name="overview"></a>Overview
 
 
-In this demo, you will use IBM Watson Studio to develop the retail churn machine learning model in a Jupyter notebook. The Jupyter notebook is written in Python and utilizes Pandas, scikit-learn and XGBoost to cleanse the data, transform it, and learn a machine learning model. 
+In this demo, you will use IBM Watson Studio to develop the retail churn machine learning model in a Jupyter notebook. The Jupyter notebook is written in Python and utilizes Pandas, scikit-learn and XGBoost to cleanse the data, transform it, and learn a machine learning model.
+
+![Demo Flow](img/Flow.png)
+
+The data you will use to train a machine learning model resides in two files that can be found in the data folder of this repository. The Jupyter notebook will access these file directly from GitHub and use them to train a machine learning model.
+
+* customer information (customer.csv)
+* transaction history (transactions.csv)
+
+Here is what the first four rows of the customer data set looks like. Notice the data anomolies. There is a text entry in the Frequency_score column, which is intended to contain only integer data. The Monetry_score column contains a value that is orders of magnitude bigger than what it should be. Monetary scores are supposed to range from 1 to 5.
+
+![customers](img/customers.jpg)
+
+Here is what the first four rows of the customer data set looks like. Notice the null values in the Retire column.
+
+![transactions](img/transactions.jpg)
+
+The data anomalies will be identified and removed in the Jupyter notebook as part of the data preparation steps in advance of training the machine learning model. Once cleaned, the data is transformed to prepare it for machine learning, and a machine learninig model is learned on the transfored data employing the XGBoost algorithm.
+
+Here is a section of code from the notebook, which can be found in the notebooks folder of this repository.
+
+![notebook](img/notebook.jpg)
+
 
 IBM Watson Machine Learning (WML) is then used a repository for storing the model and deploying it as a publically accessibe REST API endpoint.
 
 A Node.js web application used to score the model is containerized, deployed in Kubernetes on the IBM Cloud Kubernetes Service, and its URL made publically accessible so that it can be accessed in any brower over the internet. A PostgreSQL database is also deployed in the IBM Cloud Kubernetes Service. The Node.js application writes the scoring request and the predictions from the deployed machine learning model in WML into the database.
-
-![Demo Flow](img/Flow.png)
 
 
 Upon scoring customers with the web application, the feature values scored along with the model prediction results, both the churn prediction as well as the probability of chrun are inserted into a PostgreSQL database table. The table columns correpond to the nine features used to train the model along with two additional columns for the prediction result and the probability.
@@ -37,6 +56,10 @@ Upon scoring customers with the web application, the feature values scored along
 
 
 ## <a name="prerequisites"></a>Prerequisites
+
+In order to execute the demonstration, whose assets are stored in this repository, you first need an IBM Cloud account and an IBM Watson Studio account. 
+
+If you don't have these, you can go to the following links, click Sign Up, and follow the instructions to create an account.
 
 * IBM Cloud account
 	* <https://console.bluemix.net/>
@@ -48,13 +71,37 @@ Upon scoring customers with the web application, the feature values scored along
 
 ### <a name="build"></a>Build, save and deploy the machine learning model
 
-In Watson Studio:
+In Watson Studio, create a project.
 
-* Create a project
-* Add a WML service to the project
-* Create a notebook from the .ipynb file included in this repository
-* Insert the credentials with the WML service you just provisioned into the notebook
-* Run all cells in the notebook
+![New Project](img/newproj.jpg)
+
+Then create a new Watson Machine Learning Lite service in the Settings tab for your project.
+
+![WML Service](img/wmlservice.jpg)
+
+Create a notebook from the ipynb file included in this repository in the notebooks folder.
+	
+* In Watson Studio, choose to create the notebook from URL
+* Name the notebook 'RetailChurnXGBoost'
+* Copy and paste this URL into Notebook URL
+
+```
+https://raw.githubusercontent.com/hackerguy/IBM-ML/master/notebooks/RetailChurnXGBoost.ipynb
+```
+	
+* Select the 'Default Python 3.5 Free (1 vCPU and 4GB RAM) runtime, which is the free runtime.
+* Click on Create Notebook
+
+![New Notebook](img/newnotebook.jpg)
+
+
+Insert the credentials for the WML service you just provisioned into the notebook. Find the cell in the notebook that looks like this and update the values for those of your WML service.
+
+![WML Credentials](img/wmlcredentials.jpg)
+
+Run all cells in the notebook
+
+![Run All cells in notebook](img/runall.jpg)
 
 You should now have a model and deployment in your project.
 
