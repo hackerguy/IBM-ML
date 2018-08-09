@@ -17,7 +17,7 @@ The demo begins with ingesting two data sets - one with customer demographic inf
 	* [Deploy the application](#app)
 	* [Score the model](#score)
 	* [Investigate the scoring results written to the PostgreSQL database](#database)
-* [Summary](#summary)
+* [Final Comments](#final)
 
 ## <a name="demo-flow"></a>Demo Flow
 
@@ -110,7 +110,9 @@ Initialize the local CLI and also install Tiller into your Kubernetes cluster.
 
 	$ helm init
 
-`$ helm install --name postgres-release --set postgresUser=user,postgresPassword=password,postgresDatabase=churndb,persistence.enabled=false stable/postgresql`
+```
+$ helm install --name postgres-release --set postgresUser=user,postgresPassword=password,postgresDatabase=churndb,persistence.enabled=false stable/postgresql
+```
 
 Get your PostgreSQL user password
 
@@ -125,7 +127,7 @@ You will see the PostgreSQL interactive terminal (psql) prompt.
 `If you don't see a command prompt, try pressing enter.`  
 `churndb=#`
 
-Create the table for storing the churn predictions by cutting and pasting the following table create statement into psql.
+Create the table for storing the churn predictions by cutting and pasting the following table create statement into psql at the command prompt. Hit Enter if needed.
 
 ```
 -- Table: public.churn
@@ -155,6 +157,34 @@ ALTER TABLE public.churn
     OWNER to postgres;
     
 ```
+
+The exectution of the SQL statement should return this.
+
+	ALTER TABLE
+
+Show a summary of the table just created. You are only typing in '\d+ churn', 'churndb=#' is the psql command prompt.
+
+	churndb=# \d+ churn
+	
+You should see output that looks like this. Notice the column names and data types that correspond to the data types used in the machine learning model.
+
+```
+     Column      |       Type       | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------------+------------------+-----------+----------+---------+----------+--------------+-------------
+ retire          | integer          |           |          |         | plain    |              | 
+ mortgage        | text             |           |          |         | extended |              | 
+ loc             | text             |           |          |         | extended |              | 
+ gender          | text             |           |          |         | extended |              | 
+ children        | text             |           |          |         | extended |              | 
+ working         | text             |           |          |         | extended |              | 
+ highmonval      | text             |           |          |         | extended |              | 
+ agerange        | text             |           |          |         | extended |              | 
+ frequency_score | integer          |           |          |         | plain    |              | 
+ prediction      | integer          |           |          |         | plain    |              | 
+ probability     | double precision |           |          |         | plain    |              | 
+
+```
+
 Exit from psql by typing '\q' at the psql prompt.
 
 	churndb-# \q
@@ -200,7 +230,7 @@ Create the secret for PostgreSQL.
 	
 #### Deploy the Docker image to Kubernetes
 
-	$ kubectl create -f yaml/ibm-ml-deployment.yaml
+	$ kubectl create -f ../yaml/ibm-ml-deployment.yaml
 	
 #### Create a Kubernetes service
 
@@ -267,9 +297,9 @@ You should be at the psql prompt that looks like this.
 
 	churndb=#
 
-Run the following SQL query to show all rows in the table.
+Run the following SQL query to show all rows in the table. As before, 'churndb=# is the psql command prompt. You don't type that.
 
-	select * from public.churn;
+	churndb=# select * from public.churn;
 	
 You should see results that look like this.
 
@@ -289,9 +319,29 @@ Change another radio input in the web app, rerun the SQL query, and notice how e
       1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 60 to 70 |               1 |          1 |     0.17499
 (2 rows)
 ```
-## <a name="summary"></a>Summary
 
-In this demo, you've worked through an entire machine learning model life cyle - from data to deployment of cognitive application that employs the model you created.
+When you are done querying the churn results table, exit from psql and delete the associated PostgreSQL client pod it is running in by typing '\q' at the psql prompt.
+
+	churndb-# \q
+
+## <a name="final"></a>Final Comments
+
+In this demo, you've worked through an entire machine learning model life cyle - from data to deployment of a cognitive application that employs the model you created.
+
+The deployed app and associated PostgreSQL database can also be used to demonstrate the end result of the machine learning workflow run through in this demonstration (without having to deploy the app and database again).
+
+The free IBM Cloud Kubernetes cluster used in this demonstration expires in a month from the time of creation of the cluster. During this month, the application and database will remain running. You can visit the web page, for example, <http://184.172.234.202:32482> replaced with the IP address of the worker node of your cluster and the NodePort of the service you exposed, from any browser to bring up the app.
+
+Go back to PostgreSQL interactive terminal to investigate the stored results in psql.
+
+	$ kubectl run --namespace default postgres-release-postgresql-client --restart=Never --rm --tty -i --image postgres --env "PGPASSWORD=$PGPASSWORD" --command -- psql -U user -h postgres-release-postgresql churndb
+	
+Remember to close the PostgreSQL pod when finished.
+
+	churndb-# \q
+
+
+I hope you found this exercise beneficial. 
 
 [Back to Table of Contents](#toc)
 
