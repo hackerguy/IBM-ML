@@ -6,7 +6,20 @@ This repository contains a set of assets to demonstrate the development and depl
 
 The demo begins with ingesting two data sets - one with customer demographic information and the other with customer transaction history, joining, cleansing, and preparing the data for machine learning, training and evaluating a machine learning model to predict customer churn, and deploying the model as a REST API endpoint. An application is then deployed that hits this endpoint to score customers based on the highly predictive features on which the model was trained. Results of each scoring request are then stored in a database.
 
-## Demo Flow
+## <a name="toc"></a>Table of Contents
+
+* [Demo Flow](#demo-flow)
+* [Prerequisites](#prerequisites)
+* [Instructions](#instructions)
+	* [Build, save and deploy the machine learning model](#build)
+	* [Provision cluster in IBM Cloud Kubernetes Service](#provision)
+	* [Deploy PostgreSQL](#postgres)
+	* [Deploy the application](#app)
+	* [Score the model](#score)
+	* [Investigate the scoring results written to the PostgreSQL database](#database)
+* [Summary](#summary)
+
+## <a name="demo-flow"></a>Demo Flow
 
 
 In this demo, you will use IBM Watson Studio to develop the retail churn machine learning model in a Jupyter notebook. The Jupyter notebook is written in Python and utilizes Pandas, scikit-learn and XGBoost to cleanse the data, transform it, and learn a machine learning model. 
@@ -15,15 +28,15 @@ IBM Watson Machine Learning (WML) is then used a repository for storing the mode
 
 A Node.js web application used to score the model is containerized, deployed in Kubernetes on the IBM Cloud Kubernetes Service, and its URL made publically accessible so that it can be accessed in any brower over the internet. A PostgreSQL database is also deployed in the IBM Cloud Kubernetes Service. The Node.js application writes the scoring request and the predictions from the deployed machine learning model in WML into the database.
 
-![Demo Flow](images/Flow.png)
+![Demo Flow](img/Flow.png)
 
 
 Upon scoring customers with the web application, the feature values scored along with the model prediction results, both the churn prediction as well as the probability of chrun are inserted into a PostgreSQL database table. The table columns correpond to the nine features used to train the model along with two additional columns for the prediction result and the probability.
 
-![postgres](images/postgres.png)
+![postgres](img/postgres.png)
 
 
-## Prerequisites
+## <a name="prerequisites"></a>Prerequisites
 
 * IBM Cloud account
 	* <https://console.bluemix.net/>
@@ -31,9 +44,9 @@ Upon scoring customers with the web application, the feature values scored along
 	* <https://dataplatform.cloud.ibm.com/>
 
 
-## Instructions
+## <a name="instructions"></a>Instructions
 
-### Build, save and deploy the machine learning model
+### <a name="build"></a>Build, save and deploy the machine learning model
 
 In Watson Studio:
 
@@ -45,7 +58,7 @@ In Watson Studio:
 
 You should now have a model and deployment in your project.
 
-### Provision cluster in IBM Cloud Kubernetes Service
+### <a name="provision"></a>Provision cluster in IBM Cloud Kubernetes Service
 
 Download and install IBM Cloud CLI tools and the IBM Kubernetes Service plug-in.       
               
@@ -89,7 +102,7 @@ Verify that you can connect to your cluster by listing your worker nodes. As you
 	$ kubectl get nodes
 
 
-### Deploy PostgreSQL
+### <a name="postgres"></a>Deploy PostgreSQL
 
 Install helm as we will install postgresSQL using a Helm chart. Instructions for installing Helm can be found at <https://github.com/helm/helm>. Scroll down to the Install section and follow the directions for installing Helm.
 
@@ -148,7 +161,7 @@ Exit from psql by typing '\q' at the psql prompt.
 	
 ***Only exit from psql. Do NOT close the terminal.***
 	
-### Deploy the application
+### <a name="app"></a>Deploy the application
 
 #### Get the application code
 
@@ -158,7 +171,7 @@ Clone the source code for the application.
 
 Change directory.
 
-	$ cd IBM-ML
+	$ cd IBM-ML/app
 	
 
 #### Upload code to the IBM Cloud Container Registry
@@ -187,7 +200,7 @@ Create the secret for PostgreSQL.
 	
 #### Deploy the Docker image to Kubernetes
 
-	$ kubectl create -f ibm-ml-deployment.yaml
+	$ kubectl create -f yaml/ibm-ml-deployment.yaml
 	
 #### Create a Kubernetes service
 
@@ -228,7 +241,7 @@ kube-hou02-pa551ca23425854181a04a73c495951366-w1   184.172.234.202   10.76.154.1
 ```
 Find the Public IP. The Public IP you would want from output above would be '184.172.234.202'.
 
-### Score the model
+### <a name="score"></a>Score the model
 
 In a web browser, go to https://Public IP:NodePort. For example, <http://184.172.234.202:32482>.
 
@@ -236,7 +249,7 @@ In a web browser, go to https://Public IP:NodePort. For example, <http://184.172
 
 The Node.js web application should look like this.
 
-![app](images/app.jpg)
+![app](img/app.jpg)
 
 Change any of the radio button inputs, representing the features on which the machine learning model was trained, to rescore the model and display the prediction associated with the set of input features.
 
@@ -244,7 +257,7 @@ The application is designed to rescore the machine learning model and update the
 
 Let now take a look at the data you've written to the database.
 
-### Investigate the scoring results written to the PostgreSQL database
+### <a name="database"></a>Investigate the scoring results written to the PostgreSQL database
 
 Go back to PostgreSQL interactive terminal.
 
@@ -275,10 +288,12 @@ Change another radio input in the web app, rerun the SQL query, and notice how e
       1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 17 to 22 |               1 |          1 |     0.32192
       1 | Yes      | Yes | Male   | Yes      | Yes     | Yes        | 60 to 70 |               1 |          1 |     0.17499
 (2 rows)
-
 ```
+## <a name="summary"></a>Summary
 
+In this demo, you've worked through an entire machine learning model life cyle - from data to deployment of cognitive application that employs the model you created.
 
+[Back to Table of Contents](#toc)
 
 
 
