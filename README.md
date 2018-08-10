@@ -79,15 +79,15 @@ Then create a new Watson Machine Learning Lite service in the Settings tab for y
 
 ![WML Service](img/wmlservice.jpg)
 
-Create a notebook from the ipynb file included in this repository in the notebooks folder.
+Create a notebook from the ipynb file included in the notebooks folder of this repository.
 	
-* In Watson Studio, choose to create the notebook from URL
+* From your Watson Studio project, create a new notebook using the option to create the notebook from URL
 * Name the notebook 'RetailChurnXGBoost'
 * Copy and paste this URL into Notebook URL
 
-```
-https://raw.githubusercontent.com/hackerguy/IBM-ML/master/notebooks/RetailChurnXGBoost.ipynb
-```
+	```
+	https://raw.githubusercontent.com/hackerguy/IBM-ML/master/notebooks/	RetailChurnXGBoost.ipynb
+	```
 	
 * Select the 'Default Python 3.5 Free (1 vCPU and 4GB RAM) runtime, which is the free runtime.
 * Click on Create Notebook
@@ -99,12 +99,39 @@ Insert the credentials for the WML service you just provisioned into the noteboo
 
 ![WML Credentials](img/wmlcredentials.jpg)
 
-Run all cells in the notebook
+Run all cells in the notebook. You should ideally run the notebook cells one at a time and understand what is being done in each cell.
+
+Idenfify these model life cycle task as you work through the notebook.
+
+* Data ingestion
+* Profile and clean the data
+* Prepare data for machine elarning
+* Split data into training and testing data sets
+* Define a machine learning pipeline and train a model on it
+* Evaluate the model
+* Identify a best fit model and predictive importance of model features
+* Save the desired model
+* Deploy the model as a REST API endpoint
+* Score the model with random data from the test data set
+
+If you want to just run all the cells in the notebook, choose the Run All option under the Cell pull down menu. Make sure that every cell in the notebook completes successfully before moving on.
 
 ![Run All cells in notebook](img/runall.jpg)
 
-You should now have a model and deployment in your project.
+You should now have a model called 'XGBoost_model_for_Retail_Churn' listed in the Project section titled Watson Machine Learning models.
 
+You should als have a deployment called 'XGBoost_model_for_Retail_Churn' in your project.
+
+* Go to the Deployments tab in your Project
+* Click one the Deployment Name 'XGBoost_model_for_Retail_Churn'
+* Go to the Implementation tab
+
+	![Deployment Scoring End-point](img/deployment.png)
+
+* Leave this browswer tab open, or copy and save the Scoring End-point, as you will need it later when deploying the cognitive app. Your Scoring End-point will look like this.
+
+		https://us-south.ml.cloud.ibm.com/v3/wml_instances/d360e86c-6ddd-45f7-a908-d1ebf83a211d/deployments/bc639f91-8694-489b-8517-d7d3dcde368d/online
+		
 ### <a name="provision"></a>Provision cluster in IBM Cloud Kubernetes Service
 
 Download and install IBM Cloud CLI tools and the IBM Kubernetes Service plug-in.       
@@ -267,7 +294,25 @@ Build the app as a Docker image in IBM Cloud Container Registry.
 	
 #### Create the Kubernetes secrets
 
-Create the secret for WML. Replace wml_username and wml_password values with the credentials from you WML service.
+First you need to get the credential for your Watson Machine Learning service.
+
+* Target the Cloud Foundry environment on IBM Cloud. Choose the Cloud Foundry space with you Watson Machine Learning service
+
+		$ ibmcloud target —cf
+		
+* Get a list of services in the space
+	
+		$ ibmcloud cf services
+		
+* Get a list of service keys for your service using the name of your service for the list.
+
+		$ ibmcloud cf service-keys ‘Your Watson Machine Learning Service Name’
+		
+* Get the credentials using the service and service key name from the list.
+
+		$ ibmcloud cf service-key ‘Your Watson Machine Learning Service Name' ’Service Key Name’
+
+Create the secret for WML. Replace wml_username and wml_password values with the credentials from your WML service that you just found.
 	
 `$ kubectl create secret generic wml-secret --from-literal=wml_username='4be82790-d71b-4c9f-ac4e-5af3c4b9c9b1' --from-literal=wml_password='47571902-8632-47e8-9590-323f49975136'`
 
