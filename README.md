@@ -17,6 +17,7 @@ The demo begins with ingesting two data sets - one with customer demographic inf
 	* [Score the model](#score)
 	* [Investigate the scoring results written to the PostgreSQL database](#database)
 * [Final Comments](#final)
+* [TODO](#todo)
 
 ## <a name="overview"></a>Overview
 
@@ -85,9 +86,7 @@ Create a notebook from the ipynb file included in the notebooks folder of this r
 * Name the notebook 'RetailChurnXGBoost'
 * Copy and paste this URL into Notebook URL
 
-	```
-	https://raw.githubusercontent.com/hackerguy/IBM-ML/master/notebooks/	RetailChurnXGBoost.ipynb
-	```
+		https://raw.githubusercontent.com/hackerguy/IBM-ML/master/notebooks/RetailChurnXGBoost.ipynb
 	
 * Select the 'Default Python 3.5 Free (1 vCPU and 4GB RAM) runtime, which is the free runtime.
 * Click on Create Notebook
@@ -418,7 +417,7 @@ Change another radio input in the web app, rerun the SQL query, and notice how e
 (2 rows)
 ```
 
-When you are done querying the churn results table, exit from psql and delete the associated PostgreSQL client pod it is running in by typing '\q' at the psql prompt.
+When you are done querying the churn results table, exit from psql and kill the associated PostgreSQL client pod by typing '\q' at the psql prompt.
 
 	churndb-# \q
 
@@ -439,7 +438,17 @@ Remember to close the PostgreSQL pod when finished.
 	churndb-# \q
 
 
-I hope you found this exercise beneficial. 
+I hope you found this exercise beneficial.
+
+## <a name="todo"></a>TODO
+
+1. Complete Documentation
+2. Test (Mac and Windows)
+3. Port to ICP/ICP4Data
+4. Update Node app with async/await constructs
+5. Update app to integrate directly with IBM Cloud WML service
+6. Change app event model to include a form submission (rather than on-change)
+7. Expose PostgreSQL port externally
 
 [Back to Table of Contents](#toc)
 
