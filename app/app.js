@@ -37,6 +37,9 @@ console.log('postgres port = ' + PGPORT);
 console.log('postgres user = ' + PGUSER);
 console.log('postgres password = ' + PGPASSWORD);
 
+const scoring_endpoint = process.env.scoring_endpoint;
+console.log('scoring endpoint = ' + scoring_endpoint);
+
 
 const { Pool, Client } = require('pg')
 const pool = new Pool({
@@ -71,11 +74,11 @@ function tokenGet(wml_username, wml_password, service_path, token_path, loadCall
 
 
 
-function score(scoring_url, token, payload, loadCallback, errorCallback){
+function score(scoring_endpoint, token, payload, loadCallback, errorCallback){
   request({
     method: "POST",
     headers: {'Content-Type': 'application/json', 'Authorization': token},
-    url: service_path + scoring_url,
+    url: scoring_endpoint,
     body: JSON.stringify(payload)
     //body: payload
     },
@@ -151,9 +154,7 @@ tokenGet(wml_username, wml_password, service_path, token_path,
         console.log(payload)
 
 
-      var scoring_url = "/v3/wml_instances/d360e86c-6ddd-45f7-a908-d1ebf83a211d/deployments/bc639f91-8694-489b-8517-d7d3dcde368d/online";
-
-      score(scoring_url, wmlToken, payload, function (scoreResponse) {
+      score(scoring_endpoint, wmlToken, payload, function (scoreResponse) {
               prediction = scoreResponse.values[0][0];
               probability = scoreResponse.values[0][1][0];
               res.send(scoreResponse);

@@ -55,6 +55,11 @@ spec:
             secretKeyRef:
               name: pg-secret
               key: pg_password
+        - name: scoring_endpoint
+          valueFrom:
+            configMapKeyRef:
+              name: scoring-endpoint
+              key: scoring_endpoint
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

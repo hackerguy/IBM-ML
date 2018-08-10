@@ -275,6 +275,12 @@ Create the secret for PostgreSQL.
 
 	$ kubectl create secret generic pg-secret --from-literal=pg_user='user' --from-literal=pg_password='password'
 	
+#### Create a Kubernetes ConfigMap
+
+Create a ConfigMap for the scoring end-point. Replace scoring_endpoint with the value from your deployment.
+
+	$ kubectl create configmap scoring-endpoint --from-literal=scoring_endpoint='https://us-south.ml.cloud.ibm.com/v3/wml_instances/d360e86c-6ddd-45f7-a908-d1ebf83a211d/deployments/bc639f91-8694-489b-8517-d7d3dcde368d/online'
+	
 #### Deploy the Docker image to Kubernetes
 
 	$ kubectl create -f ../yaml/ibm-ml-deployment.yaml
